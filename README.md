@@ -14,7 +14,7 @@ Add this package to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  flutter_assets_cleaner: ^0.0.3
+  flutter_assets_cleaner: ^0.0.7
 
 
 ## Usage

@@ -1,10 +1,9 @@
-
 import 'dart:io';
 import 'package:path/path.dart' as p;
 
 final projectRoot = Directory.current.path;
 final pubspecPath = p.join(projectRoot, 'pubspec.yaml');
-final libDir = Directory(p.join(projectRoot, 'lib'));
+final libDir = Directory(p.join(projectRoot, 'bin'));
 
 Future<void> main() async {
   print('🔍 Checking asset usage in Flutter project...');
@@ -21,10 +20,34 @@ Future<void> main() async {
 
   if (results['unused']!.isNotEmpty) {
     print('\n💡 Tip: Consider removing unused assets to reduce app size.');
-    print('\n🧹 Deleting unused assets...');
-    deleteUnusedAssets(results['unused']!);
+
+    // Asking the user for confirmation before deletion
+    print('\nWould you like to delete unused assets? (Y/N)');
+    String? userInput = stdin.readLineSync();
+
+    if (userInput != null && userInput.toLowerCase() == 'y') {
+      print('\n🧹 Deleting unused assets...');
+      deleteUnusedAssets(results['unused']!);
+    } else {
+      print('\n❌ No assets were deleted.');
+    }
   } else {
     print('\n🎉 All assets are used. Nothing to delete!');
+  }
+}
+
+Future<void> confirmDeletion() async {
+  stdout.write('Would you like to delete unused assets? (y/n): ');
+  final response = stdin.readLineSync()?.toLowerCase();
+
+  if (response == 'y') {
+    print('🧹 Deleting unused assets...');
+    // Call your delete function or process here
+  } else if (response == 'n') {
+    print('❌ No assets will be deleted.');
+  } else {
+    print('⚠️ Invalid input. Please enter "y" for yes or "n" for no.');
+    await confirmDeletion(); // Retry the confirmation
   }
 }
 
@@ -40,20 +63,19 @@ List<String> extractAssetsFromPubspec() {
   final match = assetRegex.firstMatch(content);
   if (match == null) return [];
 
-  final assetLines =
-      match
-          .group(1)!
-          .split('\n')
-          .where((line) => line.trim().startsWith('-'))
-          .map(
-            (line) => line
-                .trim()
-                .substring(1)
-                .trim()
-                .replaceAll("'", '')
-                .replaceAll('"', ''),
-          )
-          .toList();
+  final assetLines = match
+      .group(1)!
+      .split('\n')
+      .where((line) => line.trim().startsWith('-'))
+      .map(
+        (line) => line
+            .trim()
+            .substring(1)
+            .trim()
+            .replaceAll("'", '')
+            .replaceAll('"', ''),
+      )
+      .toList();
 
   final assets = <String>[];
 
