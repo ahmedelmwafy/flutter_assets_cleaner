@@ -1,6 +1,6 @@
 name: flutter_assets_cleaner
 description: "A simple command-line tool to identify and remove unused asset files in your Flutter project. It helps you optimize your project by keeping only the necessary assets and reducing your app size."
-version: 0.0.9
+version: 0.0.10
 homepage: https://github.com/ahmedelmwafy/flutter_assets_cleaner
 
 environment:

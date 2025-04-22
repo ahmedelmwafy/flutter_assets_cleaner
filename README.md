@@ -36,7 +36,6 @@ dependencies:
 ## Usage
 
 Run the following command to use the package:
-
-```
 dart run flutter_assets_cleaner
+
 ```

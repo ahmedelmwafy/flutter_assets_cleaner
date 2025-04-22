@@ -1,3 +1,3 @@
-## 0.0.9
+## 0.0.10
 
-* TODO: ask user to delete files after show it 
+* Added functionality to prompt the user to delete files after displaying them.
