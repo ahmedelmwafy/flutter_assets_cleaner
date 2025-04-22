@@ -5,7 +5,7 @@
         "name": "Run Flutter Asset Cleaner",
         "type": "dart",
         "request": "launch",
-        "program": "bin/flutter_asset_cleaner.dart"
+        "program": "bin/flutter_assets_cleaner.dart"
       }
     ]
   }
