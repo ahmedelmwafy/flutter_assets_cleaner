@@ -3,7 +3,7 @@ import 'package:path/path.dart' as p;
 
 final projectRoot = Directory.current.path;
 final pubspecPath = p.join(projectRoot, 'pubspec.yaml');
-final libDir = Directory(p.join(projectRoot, 'bin'));
+final libDir = Directory(p.join(projectRoot, 'lib'));
 
 Future<void> main() async {
   print('🔍 Checking asset usage in Flutter project...');
@@ -27,27 +27,13 @@ Future<void> main() async {
 
     if (userInput != null && userInput.toLowerCase() == 'y') {
       print('\n🧹 Deleting unused assets...');
-      deleteUnusedAssets(results['unused']!);
+      final freedSpace = await deleteUnusedAssets(results['unused']!);
+      print('🎉 You have freed up ${freedSpace.toStringAsFixed(2)} MB of space.');
     } else {
       print('\n❌ No assets were deleted.');
     }
   } else {
     print('\n🎉 All assets are used. Nothing to delete!');
-  }
-}
-
-Future<void> confirmDeletion() async {
-  stdout.write('Would you like to delete unused assets? (y/n): ');
-  final response = stdin.readLineSync()?.toLowerCase();
-
-  if (response == 'y') {
-    print('🧹 Deleting unused assets...');
-    // Call your delete function or process here
-  } else if (response == 'n') {
-    print('❌ No assets will be deleted.');
-  } else {
-    print('⚠️ Invalid input. Please enter "y" for yes or "n" for no.');
-    await confirmDeletion(); // Retry the confirmation
   }
 }
 
@@ -200,14 +186,20 @@ void displayResults(Map<String, dynamic> results) {
   );
 }
 
-void deleteUnusedAssets(List<String> unusedAssets) {
+Future<double> deleteUnusedAssets(List<String> unusedAssets) async {
+  double totalSizeMB = 0;
+
   for (var asset in unusedAssets) {
     final file = File(p.join(projectRoot, asset));
     try {
-      file.deleteSync();
+      final fileSize = await file.length();
+      totalSizeMB += fileSize / (1024 * 1024); // Convert to MB
+      await file.delete();
       print('🗑️ Deleted: $asset');
     } catch (e) {
       print('⚠️ Could not delete "$asset": $e');
     }
   }
+
+  return totalSizeMB;
 }
