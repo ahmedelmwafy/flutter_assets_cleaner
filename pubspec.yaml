@@ -1,6 +1,6 @@
 name: flutter_assets_cleaner
 description: "A Flutter package to clean your assets folder."
-version: 0.0.1
+version: 0.0.2
 homepage: https://github.com/ahmedelmwafy/flutter_assets_cleaner
 
 environment:
