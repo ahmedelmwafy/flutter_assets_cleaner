@@ -15,3 +15,12 @@ Add this package to your `pubspec.yaml`:
 ```yaml
 dependencies:
   flutter_assets_cleaner: ^0.0.3
+
+
+## Usage
+
+Run the following command to use the package:
+
+```bash
+dart run flutter_assets_cleaner
+```
