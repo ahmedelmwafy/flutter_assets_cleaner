@@ -11,10 +11,19 @@ final ignoredDirs = ['test', 'build']; // Folders to ignore during code search
 
 Future<void> main(List<String> arguments) async {
   final parser = ArgParser()
-    ..addFlag('dry-run', abbr: 'd', defaultsTo: false, help: 'Perform a dry run without deleting files.');
+    ..addFlag('help', abbr: 'h', defaultsTo: false,)
+    ..addFlag('dry-run', abbr: 'd', defaultsTo: false, help: 'Perform a dry run without deleting files.')
+    ..addFlag('skip-interactive', abbr: 'y', defaultsTo: false, help: 'Automatically delete unused assets, skipping the interactive flow');
 
   ArgResults argResults = parser.parse(arguments);
+  final requestingHelp = argResults['help'] as bool;
   final isDryRun = argResults['dry-run'] as bool;
+  final skipInteractive = argResults['skip-interactive'] as bool;
+
+  if(requestingHelp){
+    print('Identify and clean assets in your Flutter project\nflags: --dry-run, --skip-interactive');
+    return;
+  }
 
   print('🔍 Checking asset usage in Flutter project...');
   print('🚀 Dry Run Mode: ${isDryRun ? 'Enabled' : 'Disabled'}');
@@ -87,19 +96,24 @@ Future<void> main(List<String> arguments) async {
   List<String> filesToRemoveFromDeletion = []; // List to hold files the user wants to keep
 
   if (unusedAssetsForDeletion.isNotEmpty && !isDryRun) {
-      print('\n--- Select Assets to Keep (Remove from Deletion List) ---');
-      print('The following assets are currently marked for deletion:');
+      String? userInput;
 
-      for (var i = 0; i < unusedAssetsForDeletion.length; i++) {
-          print('${i + 1}. ${unusedAssetsForDeletion[i]}');
+      if (!skipInteractive){
+        print('\n--- Select Assets to Keep (Remove from Deletion List) ---');
+        print('The following assets are currently marked for deletion:');
+
+        for (var i = 0; i < unusedAssetsForDeletion.length; i++) {
+            print('${i + 1}. ${unusedAssetsForDeletion[i]}');
+        }
+
+        print('\nEnter a comma-separated list of numbers you wish to REMOVE from the deletion list (e.g., 1, 5, 8)');
+        print('Press Enter without typing numbers to delete ALL ${unusedAssetsForDeletion.length} listed assets.');
+        stdout.write('Selection to REMOVE from deletion: ');
+        userInput = stdin.readLineSync();
+        print('');
+      } else {
+        print('Skipping interactive asset selection. Automatically marking all unused assets for deletion.');
       }
-
-      print('\nEnter a comma-separated list of numbers you wish to REMOVE from the deletion list (e.g., 1, 5, 8)');
-      print('Press Enter without typing numbers to delete ALL ${unusedAssetsForDeletion.length} listed assets.');
-      stdout.write('Selection to REMOVE from deletion: ');
-
-      String? userInput = stdin.readLineSync();
-      print('');
 
       if (userInput != null && userInput.trim().isNotEmpty) {
           final numbersToRemove = <int>{};
@@ -161,11 +175,16 @@ Future<void> main(List<String> arguments) async {
        }
       print('--- Dry Run Complete ---');
     } else {
-      print('\nFINAL CONFIRMATION: You are about to delete ${filesToActuallyDelete.length} asset(s).');
-      stdout.write('Proceed with deletion? (Y/N): ');
-       String? finalConfirm = stdin.readLineSync();
+      String? finalConfirm;
+      if(!skipInteractive){
+        print('\nFINAL CONFIRMATION: You are about to delete ${filesToActuallyDelete.length} asset(s).');
+        stdout.write('Proceed with deletion? (Y/N): ');
+        finalConfirm = stdin.readLineSync();
+      } else {
+        print('\n Skipping interactive mode and deleting unused assets');
+      }
 
-       if (finalConfirm != null && finalConfirm.toLowerCase() == 'y') {
+       if (skipInteractive || (finalConfirm != null && finalConfirm.toLowerCase() == 'y')) {
           print('\n🧹 Deleting ${filesToActuallyDelete.length} assets...');
           final freedSpace = await deleteUnusedAssets(filesToActuallyDelete);
           print('🎉 You have freed up ${freedSpace.toStringAsFixed(2)} MB of space.');
@@ -360,7 +379,7 @@ void displayResults(
   print('\n❌ Unused assets MARKED FOR DELETION:');
   int totalUnusedForDeletion = countFilesInTree(unusedTree);
   if (totalUnusedForDeletion > 0) {
-     print('(${totalUnusedForDeletion} files listed below)');
+     print('($totalUnusedForDeletion files listed below)');
      printTree(unusedTree, '', true);
   } else {
     print('  None found. 🎉');
@@ -373,8 +392,8 @@ void displayResults(
   print('- Total files found in assets/ directory (excluding hidden): $totalAssetsInDir');
   print('- Files in assets/ potentially referenced in code: $totalUsedAssets');
   print('- Files in assets/ appearing unused (Total): $totalUnused');
-  print('  - Excluded (e.g., non-empty JSON): ${totalLocalizationExcluded}');
-  print('  - Marked for deletion: ${totalUnusedForDeletion}');
+  print('  - Excluded (e.g., non-empty JSON): $totalLocalizationExcluded');
+  print('  - Marked for deletion: $totalUnusedForDeletion');
   if (totalAssetsInDir > 0) {
      print('- Percentage used: ${((totalUsedAssets / totalAssetsInDir) * 100).toStringAsFixed(2)}%');
      print('- Percentage unused (for deletion): ${((totalUnusedForDeletion / totalAssetsInDir) * 100).toStringAsFixed(2)}%');
