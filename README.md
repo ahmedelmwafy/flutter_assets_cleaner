@@ -3,7 +3,6 @@
 A simple command-line tool to identify and remove unused asset files in your Flutter project. It helps you optimize your project by keeping only the necessary assets and reducing your app size.
 
 ## Features
-* **Full Assets Scan:** Scans your entire `assets` directory recursively to find all asset files (excluding hidden files like `.DS_Store`).
 * **Code Reference Check:** Analyzes `.dart` files in your `lib` directory to find string literals. It marks an asset as potentially used if its full path, filename, or basename without extension appears as a substring within any string literal in your code.
 * **Localization Exclusion:** Automatically excludes non-empty `.json` files (commonly used for localization) from the list of assets recommended for deletion, as they are often used indirectly.
 * **Tree View Output:** Displays the assets marked for deletion and those excluded in a clear, hierarchical tree format.
