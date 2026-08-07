@@ -1,4 +1,9 @@
+## 0.0.12
+
+* Updated README with comprehensive CLI documentation and usage examples.
+
 ## 0.0.11
+
 
 * Maintenance update and code analysis fixes.
 
