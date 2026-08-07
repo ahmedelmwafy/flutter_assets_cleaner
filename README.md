@@ -1,40 +1,97 @@
 # Flutter Asset Cleaner
 
-A simple command-line tool to identify and remove unused asset files in your Flutter project. It helps you optimize your project by keeping only the necessary assets and reducing your app size.
+A command-line tool to identify and remove unused asset files in your Flutter project. It helps you optimize your application size by detecting assets that are no longer referenced in your codebase.
 
-## Features
-* **Code Reference Check:** Analyzes `.dart` files in your `lib` directory to find string literals. It marks an asset as potentially used if its full path, filename, or basename without extension appears as a substring within any string literal in your code.
-* **Localization Exclusion:** Automatically excludes non-empty `.json` files (commonly used for localization) from the list of assets recommended for deletion, as they are often used indirectly.
-* **Tree View Output:** Displays the assets marked for deletion and those excluded in a clear, hierarchical tree format.
-* **Interactive Filtering:** Allows you to interactively specify which files you want to *keep* (remove from the deletion list) by selecting from a numbered list before confirming deletion.
-* **Dry Run Mode:** Lets you see exactly which files would be deleted without actually deleting them (`--dry-run`). Highly recommended for testing!
-* **Deletion Option:** Provides a confirmed option to delete the assets that remain on the deletion list after filtering.
-* **Space Freed Calculation:** Reports the estimated disk space recovered after deletion.
-* **Pubspec Info (Optional):** Includes an informational section comparing assets declared in `pubspec.yaml` with those found and used.
+[![pub package](https://img.shields.io/pub/v/flutter_assets_cleaner.svg)](https://pub.dev/packages/flutter_assets_cleaner)
 
-## Getting Started
+---
 
-To get started with the Flutter Asset Cleaner, follow these steps:
+## ✨ Features
 
-1. Add the `flutter_assets_cleaner` package to your `pubspec.yaml` file as shown above.
-2. Run the command to start the asset cleaning process, and follow the on-screen instructions.
-3. Follow the prompts to review the assets found, choose which ones to keep,
-and confirm the deletion of unused assets.
-4. Review the generated report to understand which assets are unused and make informed decisions before deletion.
-5. confirm to delete by press y then enter
+- **Code Reference Detection:** Analyzes `.dart` files in your `lib` directory to match asset paths, filenames, or extensionless basenames against string literals in your code.
+- **Localization Protection:** Excludes non-empty `.json` files by default (commonly used for `easy_localization` or `flutter_localizations`), preventing accidental deletion of localization files.
+- **Hierarchical Tree Output:** Visualizes unused assets and protected/excluded files in a clean tree structure.
+- **Interactive Filtering:** Choose which assets to keep before confirming deletion via an interactive prompt.
+- **Dry-Run Mode:** Preview exactly which assets would be deleted without making any changes (`--dry-run`).
+- **Disk Space Recovered:** Calculates and reports total disk space saved after cleanup.
 
-## Installation
+---
 
-Add this package to your `pubspec.yaml`:
+## 🚀 Installation
+
+### Global Installation (Recommended for CLI use)
+
+Activate the package globally to run `flutter_assets_cleaner` from anywhere:
+
+```bash
+dart pub global activate flutter_assets_cleaner
+```
+
+### Local Dev Dependency
+
+Alternatively, add `flutter_assets_cleaner` to your `pubspec.yaml` under `dev_dependencies`:
 
 ```yaml
-dependencies:
-  flutter_assets_cleaner: ^0.0.9
-
-
-## Usage
-
-Run the following command to use the package:
-dart run flutter_assets_cleaner
-
+dev_dependencies:
+  flutter_assets_cleaner: ^0.0.11
 ```
+
+Then install dependencies:
+
+```bash
+flutter pub get
+```
+
+---
+
+## 💡 Usage
+
+Navigate to your Flutter project root directory and run:
+
+### Global Command
+```bash
+flutter_assets_cleaner
+```
+
+### Or using Dart Run
+```bash
+dart run flutter_assets_cleaner
+```
+
+---
+
+## 🛠️ CLI Options & Flags
+
+| Flag | Short | Description |
+| --- | --- | --- |
+| `--dry-run` | `-d` | Perform a dry run without deleting any files. Highly recommended for initial checks. |
+| `--skip-interactive` | `-y` | Automatically delete unused assets, skipping interactive prompts. |
+| `--include-json` | `-j` | Include non-empty `.json` files in the scan (by default, JSON files are excluded). |
+| `--help` | `-h` | Display usage instructions and flag information. |
+
+### Examples
+
+**Run a non-destructive dry-run check:**
+```bash
+dart run flutter_assets_cleaner --dry-run
+```
+
+**Include JSON files in scan:**
+```bash
+dart run flutter_assets_cleaner --include-json
+```
+
+**Automatically clean unused assets (for CI/CD or fast cleanup):**
+```bash
+dart run flutter_assets_cleaner --skip-interactive
+```
+
+---
+
+## 📖 How It Works
+
+1. **Scans Assets Directory:** Finds all asset files inside your project's `assets/` directory (excluding hidden files).
+2. **Scans Dart Codebase:** Searches `.dart` files within `lib/` for string references matching asset filenames or paths.
+3. **Applies Safety Rules:** Automatically filters out JSON localization files unless `--include-json` is specified.
+4. **Interactive Review:** Presents unused assets in a tree view and allows you to uncheck/keep any assets.
+5. **Clean & Summary:** Removes selected assets upon confirmation and prints the total disk space freed.
