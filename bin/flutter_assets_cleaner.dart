@@ -13,15 +13,17 @@ Future<void> main(List<String> arguments) async {
   final parser = ArgParser()
     ..addFlag('help', abbr: 'h', defaultsTo: false,)
     ..addFlag('dry-run', abbr: 'd', defaultsTo: false, help: 'Perform a dry run without deleting files.')
+    ..addFlag('include-json', abbr: 'j', defaultsTo: false, help: 'Include non-empty json files')
     ..addFlag('skip-interactive', abbr: 'y', defaultsTo: false, help: 'Automatically delete unused assets, skipping the interactive flow');
 
   ArgResults argResults = parser.parse(arguments);
   final requestingHelp = argResults['help'] as bool;
   final isDryRun = argResults['dry-run'] as bool;
+  final includeJson = argResults['include-json'] as bool;
   final skipInteractive = argResults['skip-interactive'] as bool;
 
   if(requestingHelp){
-    print('Identify and clean assets in your Flutter project\nflags: --dry-run, --skip-interactive');
+    print('Identify and clean assets in your Flutter project\nflags: --dry-run, --skip-interactive, --include-json');
     return;
   }
 
@@ -80,7 +82,7 @@ Future<void> main(List<String> arguments) async {
            isJson = false;
       }
 
-      if (isJson && isNonEmpty) {
+      if (!includeJson && isJson && isNonEmpty) {
           localizationAssetsExcluded.add(assetPath);
       } else {
           unusedAssetsForDeletion.add(assetPath);
